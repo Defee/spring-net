@@ -40,8 +40,8 @@ namespace Spring.Expressions
     /// <remarks>
     /// <p>
     /// Preparing this object once and reusing it many times for expression
-    /// evaluation can result in significant performance improvements, as 
-    /// expression parsing and reflection lookups are only performed once. 
+    /// evaluation can result in significant performance improvements, as
+    /// expression parsing and reflection lookups are only performed once.
     /// </p>
     /// </remarks>
     /// <author>Aleksandar Seovic</author>
@@ -250,15 +250,18 @@ namespace Spring.Expressions
         public Expression()
         { }
 
+#if BINARY_SERIALIZATION
         /// <summary>
         /// Create a new instance from SerializationInfo
         /// </summary>
         protected Expression( SerializationInfo info, StreamingContext context )
             : base( info, context )
-        { }
+        {
+        }
+#endif
 
         /// <summary>
-        /// Evaluates this expression for the specified root object and returns 
+        /// Evaluates this expression for the specified root object and returns
         /// value of the last node.
         /// </summary>
         /// <param name="context">Context to evaluate expressions against.</param>
@@ -283,7 +286,7 @@ namespace Spring.Expressions
         }
 
         /// <summary>
-        /// Evaluates this expression for the specified root object and sets 
+        /// Evaluates this expression for the specified root object and sets
         /// value of the last node.
         /// </summary>
         /// <param name="context">Context to evaluate expressions against.</param>
@@ -319,7 +322,7 @@ namespace Spring.Expressions
         }
 
         /// <summary>
-        /// Evaluates this expression for the specified root object and returns 
+        /// Evaluates this expression for the specified root object and returns
         /// <see cref="PropertyInfo"/> of the last node, if possible.
         /// </summary>
         /// <param name="context">Context to evaluate expression against.</param>

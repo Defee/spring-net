@@ -58,6 +58,7 @@ namespace Spring.Expressions
         {
         }
 
+#if BINARY_SERIALIZATION
         /// <summary>
         /// Create a new instance from SerializationInfo
         /// </summary>
@@ -66,6 +67,7 @@ namespace Spring.Expressions
         {
         }
 
+#endif
         /// <summary>
         /// Creates new instance of the type defined by this node.
         /// </summary>
@@ -94,7 +96,7 @@ namespace Spring.Expressions
             {
                 SetNamedArguments(instance, namedArgValues);
             }
-            
+
             return instance;
         }
 
@@ -124,7 +126,7 @@ namespace Spring.Expressions
         {
             SafeConstructor ctor = null;
             Type objectType = GetObjectType(this.getText().Trim());
-                
+
             // cache constructor info
             ConstructorInfo ci = GetBestConstructor(objectType, argValues);
             if (ci == null)
@@ -134,7 +136,7 @@ namespace Spring.Expressions
                                   "number and types of arguments does not exist.",
                                   objectType.FullName));
             }
-            else 
+            else
             {
                 ParameterInfo[] parameters = ci.GetParameters();
                 if (parameters.Length > 0)
@@ -149,7 +151,7 @@ namespace Spring.Expressions
                 }
                 ctor = new SafeConstructor(ci);
             }
-                
+
             // cache named args info
             if (namedArgValues != null)
             {

@@ -24,8 +24,14 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+
+#if REMOTING
 using System.Runtime.Remoting;
+#endif
+
+#if BINARY_SERIALIZATION
 using System.Runtime.Serialization;
+#endif
 
 using Spring.Collections;
 using Spring.Core;
@@ -59,6 +65,7 @@ namespace Spring.Expressions
         {
         }
 
+#if BINARY_SERIALIZATION
         /// <summary>
         /// Create a new instance from SerializationInfo
         /// </summary>
@@ -66,6 +73,7 @@ namespace Spring.Expressions
             : base(info, context)
         {
         }
+#endif
 
         /// <summary>
         /// Initializes the node.
@@ -98,7 +106,7 @@ namespace Spring.Expressions
                         accessor = new ExpandoObjectValueAccessor(memberName);
                     }
                     // try to initialize node as enum value first
-                    else if (contextType.IsEnum)
+                    else if (contextType.GetTypeInfo().IsEnum)
                     {
                         try
                         {
@@ -166,7 +174,7 @@ namespace Spring.Expressions
         /// Binding flags to use.
         /// </param>
         /// <returns>
-        /// Resolved property or field accessor, or <c>null</c> 
+        /// Resolved property or field accessor, or <c>null</c>
         /// if specified <paramref name="memberName"/> cannot be resolved.
         /// </returns>
         private static IValueAccessor GetPropertyOrFieldAccessor(Type contextType, string memberName, BindingFlags bindingFlags)
@@ -207,7 +215,7 @@ namespace Spring.Expressions
                     {
                         return new PropertyValueAccessor(pi);
                     }
-                    contextType = contextType.BaseType;
+                    contextType = contextType.GetTypeInfo().BaseType;
                 }
             }
 
@@ -345,7 +353,7 @@ namespace Spring.Expressions
                             "Can't change the value of the read-only property or field '" + this.memberName + "'.");
                     }
                 }
-                else if (targetType.IsPrimitive && (newValue == null || String.Empty.Equals(newValue)))
+                else if (targetType.GetTypeInfo().IsPrimitive && (newValue == null || String.Empty.Equals(newValue)))
                 {
                     throw new ArgumentException("Invalid value [" + newValue + "] for property or field '" +
                                                 this.memberName + "' of primitive type ["
@@ -355,7 +363,10 @@ namespace Spring.Expressions
                 {
                     SetPropertyOrFieldValueInternal(context, newValue);
                 }
-                else if (!RemotingServices.IsTransparentProxy(newValue) &&
+                else if (
+#if REMOTING
+!RemotingServices.IsTransparentProxy(newValue) &&
+#endif
                          (newValue is IList || newValue is IDictionary || newValue is ISet))
                 {
                     if (!AddToCollections(context, evalContext, newValue))
@@ -433,7 +444,11 @@ namespace Spring.Expressions
             bool added = false;
 
             // try adding values if property is a list...
-            if (newValue is IList && !RemotingServices.IsTransparentProxy(newValue))
+            if (newValue is IList
+#if REMOTING
+&& !RemotingServices.IsTransparentProxy(newValue)
+#endif
+                )
             {
                 IList currentValue = (IList)Get(context, evalContext);
                 if (currentValue != null && !currentValue.IsFixedSize && !currentValue.IsReadOnly)
@@ -446,7 +461,11 @@ namespace Spring.Expressions
                 }
             }
             // try adding values if property is a dictionary...
-            else if (newValue is IDictionary && !RemotingServices.IsTransparentProxy(newValue))
+            else if (newValue is IDictionary
+#if REMOTING
+                && !RemotingServices.IsTransparentProxy(newValue)
+#endif
+                )
             {
                 IDictionary currentValue = (IDictionary)Get(context, evalContext);
                 if (currentValue != null && !currentValue.IsFixedSize && !currentValue.IsReadOnly)
@@ -459,7 +478,11 @@ namespace Spring.Expressions
                 }
             }
             // try adding values if property is a set...
-            else if (newValue is ISet && !RemotingServices.IsTransparentProxy(newValue))
+            else if (newValue is ISet
+#if REMOTING
+                && !RemotingServices.IsTransparentProxy(newValue)
+#endif
+                )
             {
                 ISet currentValue = (ISet)Get(context, evalContext);
                 if (currentValue != null)
@@ -496,7 +519,7 @@ namespace Spring.Expressions
             //}
         }
 
-        #region IValueAccessor interface
+#region IValueAccessor interface
 
         private interface IValueAccessor
         {
@@ -511,9 +534,9 @@ namespace Spring.Expressions
             bool RequiresRefresh(Type contextType);
         }
 
-        #endregion
+#endregion
 
-        #region BaseValueAccessor implementation
+#region BaseValueAccessor implementation
 
         private abstract class BaseValueAccessor : IValueAccessor
         {
@@ -552,9 +575,9 @@ namespace Spring.Expressions
             }
         }
 
-        #endregion
+#endregion
 
-        #region PropertyValueAccessor implementation
+#region PropertyValueAccessor implementation
 
         private class PropertyValueAccessor : BaseValueAccessor
         {
@@ -624,9 +647,9 @@ namespace Spring.Expressions
             }
         }
 
-        #endregion
+#endregion
 
-        #region FieldValueAccessor implementation
+#region FieldValueAccessor implementation
 
         private class FieldValueAccessor : BaseValueAccessor
         {
@@ -679,9 +702,9 @@ namespace Spring.Expressions
             }
         }
 
-        #endregion
+#endregion
 
-        #region EnumValueAccessor implementation
+#region EnumValueAccessor implementation
 
         private class EnumValueAccessor : BaseValueAccessor
         {
@@ -703,9 +726,9 @@ namespace Spring.Expressions
             }
         }
 
-        #endregion
+#endregion
 
-        #region ExpandoObjectValueAccessor implementation
+#region ExpandoObjectValueAccessor implementation
 
         private class ExpandoObjectValueAccessor : BaseValueAccessor
         {
@@ -739,9 +762,9 @@ namespace Spring.Expressions
             }
         }
 
-        #endregion
+#endregion
 
-        #region TypeValueAccessor implementation
+#region TypeValueAccessor implementation
 
         private class TypeValueAccessor : BaseValueAccessor
         {
@@ -763,6 +786,6 @@ namespace Spring.Expressions
             }
         }
 
-        #endregion
+#endregion
     }
 }

@@ -49,7 +49,7 @@ namespace Spring.Core.IO
         /// </summary>
         public StringResource(string content)
             : this(content, Encoding.Default, null)
-        {            
+        {
         }
 
         /// <summary>
@@ -73,7 +73,7 @@ namespace Spring.Core.IO
         }
 
         /// <summary>
-        /// Get the <see cref="System.IO.Stream"/> to 
+        /// Get the <see cref="System.IO.Stream"/> to
         /// for accessing this resource.
         /// </summary>
         public override Stream InputStream

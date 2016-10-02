@@ -110,7 +110,7 @@ namespace Spring.Context.Attributes
         /// </returns>
         protected override bool IsRequiredConstraintSatisfiedBy(Type type)
         {
-            if (!type.Assembly.ReflectionOnly)
+            if (!type.GetTypeInfo().Assembly.ReflectionOnly)
             {
                 try
                 {
@@ -126,7 +126,7 @@ namespace Spring.Context.Attributes
 
             bool satisfied = false;
 
-            foreach (CustomAttributeData customAttributeData in CustomAttributeData.GetCustomAttributes(type))
+            foreach (CustomAttributeData customAttributeData in type.GetCustomAttributesData())
             {
                 if (customAttributeData.Constructor.DeclaringType != null &&
                     (customAttributeData.Constructor.DeclaringType.FullName == typeof(ComponentAttribute).FullName &&

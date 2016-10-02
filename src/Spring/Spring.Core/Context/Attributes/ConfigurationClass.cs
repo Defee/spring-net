@@ -155,7 +155,7 @@ namespace Spring.Context.Attributes
         /// Returns a hash code for this instance.
         /// </summary>
         /// <returns>
-        /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. 
+        /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.
         /// </returns>
         public override int GetHashCode()
         {
@@ -204,7 +204,7 @@ namespace Spring.Context.Attributes
             if (Attribute.GetCustomAttribute(_configurationClassType, typeof(ConfigurationAttribute)) != null)
             {
 
-                if (ConfigurationClassType.IsSealed)
+                if (ConfigurationClassType.GetTypeInfo().IsSealed)
                 {
                     problemReporter.Error(new SealedConfigurationProblem(SimpleName, Resource, ConfigurationClassType));
 

@@ -67,18 +67,20 @@ namespace Spring.Objects.Factory.Xml
 
         #endregion
 
-        #region Fields
+#region Fields
 
+#if XML_SCHEMA
         [NonSerialized]
         private XmlResolver resolver;
+#endif
 
         private Type documentReaderType;
         private INamespaceParserResolver namespaceParserResolver;
         private IObjectDefinitionFactory objectDefinitionFactory;
 
-        #endregion
+#endregion
 
-        #region Constructor (s) / Destructor
+#region Constructor (s) / Destructor
 
         /// <summary>
         /// Creates a new instance of the
@@ -89,7 +91,11 @@ namespace Spring.Objects.Factory.Xml
         /// instance that this reader works on.
         /// </param>
         public XmlObjectDefinitionReader(IObjectDefinitionRegistry registry)
+#if XML_SCHEMA
             : this(registry, new XmlUrlResolver())
+#else
+            : this(registry, null)
+#endif
         { }
 
         /// <summary>
@@ -128,9 +134,9 @@ namespace Spring.Objects.Factory.Xml
             this.objectDefinitionFactory = objectDefinitionFactory;
         }
 
-        #endregion
+#endregion
 
-        #region Properties
+#region Properties
 
         /// <summary>
         /// The <see cref="System.Xml.XmlResolver"/>to be used for parsing.
@@ -195,9 +201,9 @@ namespace Spring.Objects.Factory.Xml
             }
         }
 
-        #endregion
+#endregion
 
-        #region Methods
+#region Methods
 
         /// <summary>
         /// Load object definitions from the supplied XML <paramref name="resource"/>.
@@ -219,14 +225,14 @@ namespace Spring.Objects.Factory.Xml
                     ("Resource cannot be null: expected an XML resource.");
             }
 
-            #region Instrumentation
+#region Instrumentation
 
             if (log.IsDebugEnabled)
             {
                 log.Debug("Loading XML object definitions from " + resource);
             }
 
-            #endregion
+#endregion
 
             try
             {
@@ -242,23 +248,23 @@ namespace Spring.Objects.Factory.Xml
                 }
                 finally
                 {
-                    #region Close stream
+#region Close stream
                     try
                     {
                         stream.Close();
                     }
                     catch (IOException ex)
                     {
-                        #region Instrumentation
+#region Instrumentation
 
                         if (log.IsWarnEnabled)
                         {
                             log.Warn("Could not close stream.", ex);
                         }
 
-                        #endregion
+#endregion
                     }
-                    #endregion
+#endregion
                 }
             }
             catch (IOException ex)
@@ -298,7 +304,7 @@ namespace Spring.Objects.Factory.Xml
                     catch (RetryParseException)
                     {
                         if (reader != null)
-                            reader.Close();
+                            reader.Dispose();
                     }
                 }
                 return RegisterObjectDefinitions(doc, resource);
@@ -309,12 +315,14 @@ namespace Spring.Objects.Factory.Xml
                                                             "Line " + ex.LineNumber + " in XML document from " +
                                                             resource + " is not well formed.  " + ex.Message, ex);
             }
+#if XML_SCHEMA
             catch (XmlSchemaException ex)
             {
                 throw new ObjectDefinitionStoreException(resource.Description,
                                                             "Line " + ex.LineNumber + " in XML document from " +
                                                             resource + " violates the schema.  " + ex.Message, ex);
             }
+#endif
             catch (ObjectDefinitionStoreException)
             {
                 throw;
@@ -328,7 +336,7 @@ namespace Spring.Objects.Factory.Xml
         private XmlReader CreateValidatingReader(MemoryStream stream)
         {
             XmlReader reader;
-            if (SystemUtils.MonoRuntime)
+            if (!SystemUtils.SupportsXmlSchemaValidation)
             {
                 reader = XmlUtils.CreateReader(stream);
             }
@@ -337,7 +345,7 @@ namespace Spring.Objects.Factory.Xml
                 reader = XmlUtils.CreateValidatingReader(stream, Resolver, NamespaceParserRegistry.GetSchemas(), HandleValidation);
             }
 
-            #region Instrumentation
+#region Instrumentation
 
             if (log.IsDebugEnabled)
             {
@@ -345,7 +353,7 @@ namespace Spring.Objects.Factory.Xml
             }
             return reader;
 
-            #endregion
+#endregion
         }
 
         /// <summary>
@@ -372,7 +380,7 @@ namespace Spring.Objects.Factory.Xml
             }
             else
             {
-                #region Instrumentation
+#region Instrumentation
 
                 if (log.IsWarnEnabled)
                 {
@@ -381,7 +389,7 @@ namespace Spring.Objects.Factory.Xml
                         args.Exception);
                 }
 
-                #endregion
+#endregion
             }
         }
 
@@ -416,7 +424,7 @@ namespace Spring.Objects.Factory.Xml
         /// Creates the <see cref="IObjectDefinitionDocumentReader"/> to use for actually
         /// reading object definitions from an XML document.
         /// </summary>
-        /// <remarks>Default implementation instantiates the specified <see cref="DocumentReaderType"/> 
+        /// <remarks>Default implementation instantiates the specified <see cref="DocumentReaderType"/>
         /// or <see cref="DefaultObjectDefinitionDocumentReader"/> if no reader type is specified.</remarks>
         /// <returns></returns>
         protected virtual IObjectDefinitionDocumentReader CreateObjectDefinitionDocumentReader()
@@ -429,7 +437,7 @@ namespace Spring.Objects.Factory.Xml
         }
 
         /// <summary>
-        /// Creates the <see cref="XmlReaderContext"/> to be passed along 
+        /// Creates the <see cref="XmlReaderContext"/> to be passed along
         /// during the object definition reading process.
         /// </summary>
         /// <param name="resource">The underlying <see cref="IResource"/> that is currently processed.</param>
@@ -450,6 +458,6 @@ namespace Spring.Objects.Factory.Xml
             return new DefaultNamespaceHandlerResolver();
         }
 
-        #endregion
+#endregion
     }
 }

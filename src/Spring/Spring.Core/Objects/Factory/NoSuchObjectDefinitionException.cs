@@ -132,29 +132,32 @@ namespace Spring.Objects.Factory
 			_objectType = type;
 		}
 
-		/// <summary>
-		/// Creates a new instance of the
-		/// <see cref="Spring.Objects.Factory.NoSuchObjectDefinitionException"/> class.
-		/// </summary>
-		/// <param name="info">
-		/// The <see cref="System.Runtime.Serialization.SerializationInfo"/>
-		/// that holds the serialized object data about the exception being thrown.
-		/// </param>
-		/// <param name="context">
-		/// The <see cref="System.Runtime.Serialization.StreamingContext"/>
-		/// that contains contextual information about the source or destination.
-		/// </param>
+#if BINARY_SERIALIZATION
+        /// <summary>
+        /// Creates a new instance of the
+        /// <see cref="Spring.Objects.Factory.NoSuchObjectDefinitionException"/> class.
+        /// </summary>
+        /// <param name="info">
+        /// The <see cref="System.Runtime.Serialization.SerializationInfo"/>
+        /// that holds the serialized object data about the exception being thrown.
+        /// </param>
+        /// <param name="context">
+        /// The <see cref="System.Runtime.Serialization.StreamingContext"/>
+        /// that contains contextual information about the source or destination.
+        /// </param>
 		protected NoSuchObjectDefinitionException(SerializationInfo info, StreamingContext context)
 			: base(info, context)
 		{
 			_objectName = info.GetString("ObjectName");
 			_objectType = info.GetValue("ObjectType", typeof (Type)) as Type;
 		}
+#endif
 
-		#endregion
+        #endregion
 
-		#region Methods
+#region Methods
 
+#if BINARY_SERIALIZATION
 		/// <summary>
 		/// Populates a <see cref="System.Runtime.Serialization.SerializationInfo"/> with
 		/// the data needed to serialize the target object.
@@ -175,10 +178,11 @@ namespace Spring.Objects.Factory
 			info.AddValue("ObjectName", ObjectName);
 			info.AddValue("ObjectType", ObjectType);
 		}
+#endif
 
-		#endregion
+#endregion
 
-		#region Properties
+#region Properties
 
 		/// <summary>
 		/// Return the required <see cref="System.Type"/> of object, if it was a
@@ -198,13 +202,13 @@ namespace Spring.Objects.Factory
 			get { return _objectName; }
 		}
 
-		#endregion
+#endregion
 
-		#region Fields
+#region Fields
 
 		private Type _objectType;
 		private string _objectName;
 
-		#endregion
+#endregion
 	}
 }

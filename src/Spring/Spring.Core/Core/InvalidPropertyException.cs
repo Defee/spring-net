@@ -136,6 +136,7 @@ namespace Spring.Core
         {
         }
 
+#if BINARY_SERIALIZATION
         /// <summary>
         /// Creates a new instance of the
         /// <see cref="InvalidPropertyException"/> class.
@@ -154,6 +155,7 @@ namespace Spring.Core
             offendingObjectType = info.GetValue("ObjectType", typeof (Type)) as Type;
             offendingPropertyName = info.GetString("OffendingPropertyName");
         }
+#endif
 
         #endregion
 
@@ -180,6 +182,7 @@ namespace Spring.Core
 
         #region Methods
 
+#if BINARY_SERIALIZATION
         /// <summary>
         /// Populates a <see cref="System.Runtime.Serialization.SerializationInfo"/> with
         /// the data needed to serialize the target object.
@@ -200,6 +203,7 @@ namespace Spring.Core
             info.AddValue("ObjectType", ObjectType, typeof (Type));
             info.AddValue("OffendingPropertyName", OffendingPropertyName);
         }
+#endif
 
         #endregion
 

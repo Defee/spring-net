@@ -121,7 +121,7 @@ namespace Spring.Context.Attributes
         /// <returns></returns>
         public IAssemblyTypeScanner AssemblyHavingType<T>()
         {
-            TypeSources.Add(new AssemblyTypeSource((typeof(T).Assembly)));
+            TypeSources.Add(new AssemblyTypeSource((typeof(T).GetTypeInfo().Assembly)));
             return this;
         }
 
@@ -308,9 +308,13 @@ namespace Spring.Context.Attributes
 
         private string GetCurrentBinDirectoryPath()
         {
+#if NETCORE
+            return AppContext.BaseDirectory;
+#else
             return string.IsNullOrEmpty(AppDomain.CurrentDomain.DynamicDirectory)
                        ? AppDomain.CurrentDomain.BaseDirectory
                        : AppDomain.CurrentDomain.DynamicDirectory;
+#endif
         }
 
         /// <summary>

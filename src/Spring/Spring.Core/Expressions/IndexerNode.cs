@@ -50,6 +50,7 @@ namespace Spring.Expressions
         {
         }
 
+#if BINARY_SERIALIZATION
         /// <summary>
         /// Create a new instance from SerializationInfo
         /// </summary>
@@ -57,7 +58,8 @@ namespace Spring.Expressions
             : base(info, context)
         {
         }
-        
+#endif
+
         /// <summary>
         /// Returns node's value for the given context.
         /// </summary>
@@ -132,7 +134,7 @@ namespace Spring.Expressions
             {
                 throw new NullValueInNestedPathException("Cannot set the value of the indexer because the context for its resolution is null.");
             }
-            
+
             try
             {
                 if (context is Array)
@@ -176,7 +178,7 @@ namespace Spring.Expressions
             {
                 throw new InvalidPropertyException( evalContext.RootContextType,this.ToString(),"Invalid argument.",e );
             }
-            
+
         }
 
         /// <summary>
